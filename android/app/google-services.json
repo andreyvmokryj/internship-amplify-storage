@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "72098826413",
+    "firebase_url": "https://radency-internship-2-yokoy-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "radency-internship-2-yokoy",
+    "storage_bucket": "radency-internship-2-yokoy.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:72098826413:android:34f6a51e682d4c3a315e24",
+        "android_client_info": {
+          "package_name": "com.radency.radency_internship_project_2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "72098826413-59f8p3q6fg4qgi2gc73ksp7hfth29ieq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.radency.radency_internship_project_2",
+            "certificate_hash": "229560e6b4dc5766200c0d6060b58bb8d1bee28a"
+          }
+        },
+        {
+          "client_id": "72098826413-gvdcba6kp72d3n59dthudr5gbk7f7jqc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.radency.radency_internship_project_2",
+            "certificate_hash": "0247ff983f18ca70de872c7235a3defa6966636f"
+          }
+        },
+        {
+          "client_id": "72098826413-ipn2648rvlfms1bnq41gflblraga766i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPLVbRzYF4B-Q05aOjQzJ1gbFh4HdDp4Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "72098826413-ipn2648rvlfms1bnq41gflblraga766i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "72098826413-ef8usjccmqko5e5g6l4o70k0567l19jh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.radency.radencyInternshipProject2"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

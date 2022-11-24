@@ -1,0 +1,27 @@
+lane :bump_major do
+  flutter_version_manager(
+    arguments: "-major",
+    yml: "./version.yml",
+    pubspec: "./pubspec.yaml")
+end
+
+lane :bump_minor do
+  flutter_version_manager(
+    arguments: "-minor",
+    yml: "./version.yml",
+    pubspec: "./pubspec.yaml")
+end
+
+lane :bump_patch do
+  flutter_version_manager(
+    arguments: "-patch",
+    yml: "./version.yml",
+    pubspec: "./pubspec.yaml")
+end
+
+lane :apply_new_version do
+  flutter_version_manager(
+    arguments: "-apply",
+    yml: "./version.yml",
+    pubspec: "./pubspec.yaml")
+end

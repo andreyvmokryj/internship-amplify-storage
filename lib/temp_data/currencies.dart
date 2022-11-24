@@ -1,0 +1,1 @@
+List currencies = ['UAH', 'USD', 'GBP'];

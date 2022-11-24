@@ -1,0 +1,38 @@
+type User @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  email: AWSEmail
+  name: String
+  photo: String
+  emailVerified: Boolean
+  AppTransactions: [AppTransaction] @hasMany(indexName: "byUser", fields: ["id"])
+}
+
+type AppTransaction @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  transactionType: TransactionType!
+  date: AWSDateTime!
+  accountOrigin: String!
+  amount: Float!
+  note: String
+  currency: String!
+  subcurrency: String
+  category: String
+  creationType: ExpenseCreationType
+  locationLatitude: Float
+  locationLongitude: Float
+  accountDestination: String
+  fees: Float
+  userID: ID! @index(name: "byUser")
+}
+
+enum TransactionType {
+  Income
+  Expense
+  Transfer
+}
+
+enum ExpenseCreationType {
+  IMPORT
+  AI
+  MANUAL
+}
