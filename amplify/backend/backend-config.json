@@ -26,5 +26,12 @@
         ]
       }
     }
+  },
+  "storage": {
+    "s3internshipamplifystoragestorage538c07f1": {
+      "service": "S3",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": []
+    }
   }
 }

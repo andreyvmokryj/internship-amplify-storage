@@ -19,8 +19,10 @@
 
 // ignore_for_file: public_member_api_docs, annotate_overrides, dead_code, dead_codepublic_member_api_docs, depend_on_referenced_packages, file_names, library_private_types_in_public_api, no_leading_underscores_for_library_prefixes, no_leading_underscores_for_local_identifiers, non_constant_identifier_names, null_check_on_nullable_type_parameter, prefer_adjacent_string_concatenation, prefer_const_constructors, prefer_if_null_operators, prefer_interpolation_to_compose_strings, slash_for_doc_comments, sort_child_properties_last, unnecessary_const, unnecessary_constructor_name, unnecessary_late, unnecessary_new, unnecessary_null_aware_assignments, unnecessary_nullable_for_final_variable_declarations, unnecessary_string_interpolations, use_build_context_synchronously
 
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:aws_dynamodb_api/dynamodb-2012-08-10.dart';
+
 import 'ModelProvider.dart';
-import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/foundation.dart';
 
 
@@ -293,6 +295,48 @@ class AppTransaction extends Model {
   Map<String, Object?> toMap() => {
     'id': id, 'transactionType': _transactionType, 'date': _date, 'accountOrigin': _accountOrigin, 'amount': _amount, 'note': _note, 'currency': _currency, 'subcurrency': _subcurrency, 'category': _category, 'creationType': _creationType, 'locationLatitude': _locationLatitude, 'locationLongitude': _locationLongitude, 'accountDestination': _accountDestination, 'fees': _fees, 'userID': _userID, 'createdAt': _createdAt, 'updatedAt': _updatedAt
   };
+
+  factory AppTransaction.fromDBValue(Map<String, AttributeValue> dbValue) {
+    return AppTransaction(
+      id: dbValue["id"]!.s!,
+      transactionType: enumFromString<TransactionType>(dbValue["transactionType"]!.s!, TransactionType.values)!,
+      date: TemporalDateTime.fromString(dbValue['date']!.s!),
+      accountOrigin: dbValue["accountOrigin"]!.s!,
+      amount: double.parse(dbValue["amount"]!.n!),
+      note: dbValue["note"]?.s,
+      currency: dbValue["currency"]!.s!,
+      subcurrency: dbValue["subcurrency"]?.s,
+      category: dbValue["category"]?.s,
+      creationType: enumFromString<ExpenseCreationType>(dbValue["creationType"]!.s!, ExpenseCreationType.values)!,
+      locationLatitude: double.tryParse(dbValue["locationLatitude"]?.n ?? ""),
+      locationLongitude: double.tryParse(dbValue["locationLongitude"]?.n ?? ""),
+      accountDestination: dbValue["accountDestination"]?.s,
+      fees: double.tryParse(dbValue["fees"]?.n ?? ""),
+      userID: dbValue["userID"]?.s,
+    );
+  }
+
+  Map<String, AttributeValue> toDBValue() {
+    Map<String, AttributeValue> dbMap = Map();
+    dbMap["id"] = AttributeValue(s: id);
+    dbMap["transactionType"] = AttributeValue(s: enumToString(_transactionType));
+    dbMap["date"] = AttributeValue(s: _date?.format());
+    dbMap["accountOrigin"] = AttributeValue(s: _accountOrigin);
+    dbMap["amount"] = AttributeValue(n: _amount.toString());
+    dbMap["note"] = AttributeValue(s: _note);
+    dbMap["currency"] = AttributeValue(s: _currency);
+    dbMap["subcurrency"] = AttributeValue(s: _subcurrency);
+    dbMap["category"] = AttributeValue(s: _category);
+    dbMap["creationType"] = AttributeValue(s: enumToString(_creationType));
+    dbMap["locationLatitude"] = AttributeValue(n: _locationLatitude.toString());
+    dbMap["locationLongitude"] = AttributeValue(n: _locationLongitude.toString());
+    dbMap["accountDestination"] = AttributeValue(s: _accountDestination);
+    dbMap["fees"] = AttributeValue(n: _fees.toString());
+    dbMap["userID"] = AttributeValue(s: _userID);
+    dbMap["createdAt"] = AttributeValue(s: _createdAt?.format());
+    dbMap["updatedAt"] = AttributeValue(s: _updatedAt?.format());
+    return dbMap;
+  }
 
   static final QueryField ID = QueryField(fieldName: "id");
   static final QueryField TRANSACTIONTYPE = QueryField(fieldName: "transactionType");
