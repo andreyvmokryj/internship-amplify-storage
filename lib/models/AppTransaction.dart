@@ -49,9 +49,14 @@ class AppTransaction extends Model {
   @override
   getInstanceType() => classType;
   
+  @Deprecated('[getId] is being deprecated in favor of custom primary key feature. Use getter [modelIdentifier] to get model identifier.')
   @override
-  String getId() {
-    return id;
+  String getId() => id;
+  
+  AppTransactionModelIdentifier get modelIdentifier {
+      return AppTransactionModelIdentifier(
+        id: id
+      );
   }
   
   TransactionType get transactionType {
@@ -294,6 +299,7 @@ class AppTransaction extends Model {
     'id': id, 'transactionType': _transactionType, 'date': _date, 'accountOrigin': _accountOrigin, 'amount': _amount, 'note': _note, 'currency': _currency, 'subcurrency': _subcurrency, 'category': _category, 'creationType': _creationType, 'locationLatitude': _locationLatitude, 'locationLongitude': _locationLongitude, 'accountDestination': _accountDestination, 'fees': _fees, 'userID': _userID, 'createdAt': _createdAt, 'updatedAt': _updatedAt
   };
 
+  static final QueryModelIdentifier<AppTransactionModelIdentifier> MODEL_IDENTIFIER = QueryModelIdentifier<AppTransactionModelIdentifier>();
   static final QueryField ID = QueryField(fieldName: "id");
   static final QueryField TRANSACTIONTYPE = QueryField(fieldName: "transactionType");
   static final QueryField DATE = QueryField(fieldName: "date");
@@ -437,4 +443,48 @@ class _AppTransactionModelType extends ModelType<AppTransaction> {
   AppTransaction fromJson(Map<String, dynamic> jsonData) {
     return AppTransaction.fromJson(jsonData);
   }
+}
+
+/**
+ * This is an auto generated class representing the model identifier
+ * of [AppTransaction] in your schema.
+ */
+@immutable
+class AppTransactionModelIdentifier implements ModelIdentifier<AppTransaction> {
+  final String id;
+
+  /** Create an instance of AppTransactionModelIdentifier using [id] the primary key. */
+  const AppTransactionModelIdentifier({
+    required this.id});
+  
+  @override
+  Map<String, dynamic> serializeAsMap() => (<String, dynamic>{
+    'id': id
+  });
+  
+  @override
+  List<Map<String, dynamic>> serializeAsList() => serializeAsMap()
+    .entries
+    .map((entry) => (<String, dynamic>{ entry.key: entry.value }))
+    .toList();
+  
+  @override
+  String serializeAsString() => serializeAsMap().values.join('#');
+  
+  @override
+  String toString() => 'AppTransactionModelIdentifier(id: $id)';
+  
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    
+    return other is AppTransactionModelIdentifier &&
+      id == other.id;
+  }
+  
+  @override
+  int get hashCode =>
+    id.hashCode;
 }
