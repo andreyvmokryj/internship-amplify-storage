@@ -121,11 +121,12 @@ class ExpensesMapBloc extends Bloc<ExpensesMapEvent, ExpensesMapState> {
 
     _sliderCurrentTimeIntervalString = DateHelper().monthNameAndYearFromDateTimeString(_observedDate!);
     yield state.setSliderTitle(sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString, clearMarkers: true);
-    expenseMapTimeIntervalSubscription =(await transactionsRepository
+    expenseMapTimeIntervalSubscription =( transactionsRepository
         .getTransactionsByTimePeriod(
             start: DateHelper().getFirstDayOfMonth(dateForFetch), end: DateHelper().getLastDayOfMonth(dateForFetch)))
+        .asStream()
         .listen((event) {
-      add(ExpensesMapDisplayRequested(transactions: event.items, data: _sliderCurrentTimeIntervalString));
+      add(ExpensesMapDisplayRequested(transactions: event, data: _sliderCurrentTimeIntervalString));
     });
   }
 

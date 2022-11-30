@@ -133,12 +133,13 @@ class BudgetOverviewBloc extends Bloc<BudgetOverviewEvent, BudgetOverviewState> 
 
     _sliderCurrentTimeIntervalString = DateHelper().monthNameAndYearFromDateTimeString(_observedDate!);
     yield BudgetOverviewLoading(sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString);
-    budgetOverviewSubscription = (await transactionsRepository
+    budgetOverviewSubscription = ( transactionsRepository
         .getTransactionsByTimePeriod(
             start: DateHelper().getFirstDayOfMonth(_observedDate!), end: DateHelper().getLastDayOfMonth(_observedDate!)))
+        .asStream()
         .listen((event) {
       monthlyCategoryExpenses.clear();
-      transactions = event.items;
+      transactions = event;
       add(BudgetOverviewDisplayRequested());
     });
   }

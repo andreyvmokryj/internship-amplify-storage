@@ -117,11 +117,12 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
 
     _sliderCurrentTimeIntervalString = DateHelper().monthNameAndYearFromDateTimeString(_observedDate!);
     yield TransactionsDailyLoading(sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString);
-    dailyTransactionsSubscription = (await transactionsRepository
+    dailyTransactionsSubscription = ( transactionsRepository
         .getTransactionsByTimePeriod(
             start: DateHelper().getFirstDayOfMonth(_observedDate!), end: DateHelper().getLastDayOfMonth(_observedDate!)))
+        .asStream()
         .listen((event) {
-      dailyData = event.items;
+      dailyData = event;
       add(TransactionsDailyDisplayRequested(
           transactions: dailyData, sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString));
     });

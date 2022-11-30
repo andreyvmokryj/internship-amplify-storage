@@ -27,11 +27,14 @@ class CsvExportBloc extends Bloc<CsvExportEvent, CsvExportState> {
   }
 
   saveCSV() async {
-    List<AppTransaction> data = await transactionsRepository.getAllData();
+    List<AppTransaction?> data = await transactionsRepository.getAllData();
     List<List<String>> list = [];
     data.forEach((transaction) {
-      List<String> convertedTransaction = TransactionsHelper().toStringInList(transaction);
-      list.add(convertedTransaction);
+      if (transaction != null) {
+        List<String> convertedTransaction = TransactionsHelper().toStringInList(
+            transaction);
+        list.add(convertedTransaction);
+      }
     });
     String filePath = await getCsvFilePath();
     String csv = createCsvString(list);
