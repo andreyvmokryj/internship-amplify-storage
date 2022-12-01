@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:radency_internship_project_2/blocs/settings/settings_bloc.dart';
+import 'package:radency_internship_project_2/local_models/transactions/transactions_helper.dart';
 import 'package:radency_internship_project_2/models/AppTransaction.dart';
+import 'package:radency_internship_project_2/providers/amplify_api_provider.dart';
 import 'package:radency_internship_project_2/repositories/transactions_repository.dart';
 import 'package:radency_internship_project_2/utils/date_helper.dart';
 
@@ -17,9 +20,11 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
   TransactionsDailyBloc({
     required this.settingsBloc,
     required this.transactionsRepository,
+    required this.apiProvider,
   }) : super(TransactionsDailyInitial());
 
   final TransactionsRepository transactionsRepository;
+  final AmplifyApiProvider apiProvider;
 
   SettingsBloc settingsBloc;
   StreamSubscription? settingsSubscription;
@@ -32,11 +37,17 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
 
   StreamSubscription? dailyTransactionsSubscription;
   StreamSubscription<AuthHubEvent>? _onUserChangedSubscription;
+  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionAddedSubscription;
+  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionChangedSubscription;
+  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionDeletedSubscription;
 
   @override
   Future<void> close() {
     dailyTransactionsSubscription?.cancel();
     settingsSubscription?.cancel();
+    _onTransactionChangedSubscription?.cancel();
+    _onTransactionAddedSubscription?.cancel();
+    _onTransactionDeletedSubscription?.cancel();
     _onUserChangedSubscription?.cancel();
     return super.close();
   }
@@ -68,6 +79,10 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
     _observedDate = DateTime.now();
 
     _onUserChangedSubscription = Amplify.Hub.listen(HubChannel.Auth, (hubEvent) {
+      _onTransactionChangedSubscription?.cancel();
+      _onTransactionAddedSubscription?.cancel();
+      _onTransactionDeletedSubscription?.cancel();
+
       print("${hubEvent.payload?.userId}");
         if (hubEvent.payload == null) {
           dailyData.clear();
@@ -94,6 +109,11 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
 
   Stream<TransactionsDailyState> _mapTransactionDailyUserChangedToState(String id) async* {
     yield TransactionsDailyLoading(sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString);
+
+    AmplifyStreamGroup streams = apiProvider.getTransactionsStreams();
+    _onTransactionAddedSubscription = streams.onTransactionAdded.listen(_onTransactionAdded);
+    _onTransactionChangedSubscription = streams.onTransactionChanged.listen(_onTransactionChanged);
+    _onTransactionDeletedSubscription = streams.onTransactionDeleted.listen(_onTransactionDeleted);
 
     _observedDate = DateTime.now();
     add(TransactionsDailyFetchRequested(dateForFetch: _observedDate!));
@@ -161,5 +181,68 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
     });
 
     return map;
+  }
+
+  // void subscribe()  {
+  //   final onTransactionAddedRequest = ModelSubscriptions.onCreate(AppTransaction.classType);
+  //   final Stream<GraphQLResponse<AppTransaction>> addOperation = Amplify.API.subscribe(
+  //     onTransactionAddedRequest,
+  //     onEstablished: () => print('Subscription on added established'),
+  //   );
+  //   _onTransactionAddedSubscription = addOperation.listen(
+  //         (event) {
+  //           /// TODO: handle on add event
+  //       print('Subscription event data received: ${event.data}');
+  //     },
+  //     onError: (Object e) => print('Error in subscription stream: $e'),
+  //   );
+  // }
+
+  _onTransactionAdded(GraphQLResponse<AppTransaction> event) async {
+    print('TransactionsBloc: snapshot ${event.data}');
+    if (event.data == null) {
+      return;
+    }
+
+    AppTransaction transaction = event.data!;
+
+    // TODO: split this into readable appearance..
+    if ((transaction.date.getDateTimeInUtc().isAfter(DateHelper().getFirstDayOfMonth(_observedDate!)) ||
+        transaction.date.getDateTimeInUtc() == DateHelper().getFirstDayOfMonth(_observedDate!)) &&
+        transaction.date.getDateTimeInUtc().isBefore(DateHelper().getLastDayOfMonth(_observedDate!)) &&
+        dailyData.indexWhere((element) => element.id == transaction.id) == -1) {
+      dailyData.add(transaction);
+      add(TransactionsDailyDisplayRequested(
+          sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString, transactions: dailyData));
+    }
+  }
+
+  _onTransactionChanged(GraphQLResponse<AppTransaction> event) async {
+    if (event.data == null) {
+      return;
+    }
+    AppTransaction changedTransaction = event.data!;
+
+    int oldTransactionIndex = dailyData.indexWhere((transaction) => transaction.id == changedTransaction.id);
+
+    if (oldTransactionIndex != -1) {
+      dailyData[oldTransactionIndex] = changedTransaction;
+    }
+    add(TransactionsDailyDisplayRequested(
+        sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString, transactions: dailyData));
+  }
+
+  _onTransactionDeleted(GraphQLResponse<AppTransaction> event) async {
+    if (event.data == null) {
+      return;
+    }
+
+    int index = dailyData.indexWhere((transaction) => transaction.id == event.data!.id);
+    if (index != -1) {
+      dailyData.removeAt(index);
+    }
+
+    add(TransactionsDailyDisplayRequested(
+        sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString, transactions: dailyData));
   }
 }

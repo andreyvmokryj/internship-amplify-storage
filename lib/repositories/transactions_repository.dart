@@ -39,10 +39,15 @@ class TransactionsRepository extends IRepository<AppTransaction> {
     final snapshot = await find(transactionID: transactionID);
     if (snapshot != null && snapshot.userID == uid) {
       // await Amplify.DataStore.delete(snapshot);
-      final request = ModelMutations.delete(snapshot);
+      final request = ModelMutations.deleteById(AppTransaction.classType, transactionID!);
       final response = await Amplify.API.mutate(request: request).response;
       print('Response: $response');
     }
+
+    // String uid = await amplifyAuthenticationService.getUserID();
+    // final request = ModelMutations.deleteById(uid);
+    // final response = await Amplify.API.mutate(request: request).response;
+    // print('Response: $response');
   }
 
   @override

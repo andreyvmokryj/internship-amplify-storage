@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:radency_internship_project_2/amplifyconfiguration.dart';
 import 'package:radency_internship_project_2/models/ModelProvider.dart';
+import 'package:radency_internship_project_2/providers/amplify_api_provider.dart';
 import 'package:radency_internship_project_2/providers/amplify_auth_service.dart';
 import 'package:radency_internship_project_2/providers/biometric_credentials_service.dart';
 import 'package:radency_internship_project_2/providers/hive/hive_provider.dart';
@@ -22,12 +23,14 @@ void main() async {
   await HiveProvider().initializeHive(directory.path);
 
   AmplifyAuthenticationService amplifyAuthenticationService = AmplifyAuthenticationService();
+  AmplifyApiProvider apiProvider = AmplifyApiProvider();
   TransactionsRepository transactionsRepository = TransactionsRepository(
       amplifyAuthenticationService: amplifyAuthenticationService);
 
   runApp(Authenticator(
     child: App(
       amplifyAuthenticationService: amplifyAuthenticationService,
+      apiProvider: apiProvider,
       biometricCredentialsService: BiometricCredentialsService(),
       budgetsRepository: BudgetsRepository(),
       transactionsRepository: transactionsRepository,
