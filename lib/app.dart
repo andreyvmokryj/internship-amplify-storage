@@ -109,6 +109,7 @@ class App extends StatelessWidget {
             BlocProvider(
               create: (context) => TransactionsDailyBloc(
                 apiProvider: apiProvider,
+                amplifyAuthenticationService: amplifyAuthenticationService,
                 settingsBloc: BlocProvider.of<SettingsBloc>(context),
                 transactionsRepository: transactionsRepository,
               )..add(TransactionsDailyInitialize()),

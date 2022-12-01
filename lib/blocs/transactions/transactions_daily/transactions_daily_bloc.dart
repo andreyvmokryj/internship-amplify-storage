@@ -9,6 +9,7 @@ import 'package:radency_internship_project_2/blocs/settings/settings_bloc.dart';
 import 'package:radency_internship_project_2/local_models/transactions/transactions_helper.dart';
 import 'package:radency_internship_project_2/models/AppTransaction.dart';
 import 'package:radency_internship_project_2/providers/amplify_api_provider.dart';
+import 'package:radency_internship_project_2/providers/amplify_auth_service.dart';
 import 'package:radency_internship_project_2/repositories/transactions_repository.dart';
 import 'package:radency_internship_project_2/utils/date_helper.dart';
 
@@ -21,10 +22,12 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
     required this.settingsBloc,
     required this.transactionsRepository,
     required this.apiProvider,
+    required this.amplifyAuthenticationService,
   }) : super(TransactionsDailyInitial());
 
   final TransactionsRepository transactionsRepository;
   final AmplifyApiProvider apiProvider;
+  final AmplifyAuthenticationService amplifyAuthenticationService;
 
   SettingsBloc settingsBloc;
   StreamSubscription? settingsSubscription;
@@ -105,6 +108,8 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
     });
 
     add(TransactionsDailyFetchRequested(dateForFetch: _observedDate!));
+
+    add(TransactionDailyUserChanged(id: (await amplifyAuthenticationService.getUserID())));
   }
 
   Stream<TransactionsDailyState> _mapTransactionDailyUserChangedToState(String id) async* {
