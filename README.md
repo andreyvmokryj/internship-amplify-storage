@@ -1,23 +1,23 @@
 # Amplify GraphQL API
-## Connect to existing Amplify project 
+### Connect to existing Amplify project 
 
 ```
 amplify pull --appId <AMPLIFY_APP_ID> --envName <ENVIRONMENT>
 ```
 
-## Pull further updates 
+### Pull further updates 
 
 ```
 amplify pull
 ```
 
-## Push local updates (any changes to 'amplify' directory)
+### Push local updates (any changes to 'amplify' directory)
 
 ```
 amplify push
 ```
 
-## Generate Amplify models
+### Generate Amplify models
 
 ```
 amplify codegen <PATH_TO_MODELS_DIR>
