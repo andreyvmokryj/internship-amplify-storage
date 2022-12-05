@@ -15,6 +15,7 @@ import 'package:radency_internship_project_2/blocs/transactions/add_transaction/
 import 'package:radency_internship_project_2/blocs/transactions/add_transaction/transaction_type/transaction_type_bloc.dart';
 import 'package:radency_internship_project_2/blocs/transactions/transactions_calendar/transactions_calendar_bloc.dart';
 import 'package:radency_internship_project_2/blocs/transactions/transactions_summary/transactions_summary_bloc.dart';
+import 'package:radency_internship_project_2/providers/amplify_api_provider.dart';
 import 'package:radency_internship_project_2/providers/amplify_auth_service.dart';
 import 'package:radency_internship_project_2/providers/biometric_credentials_service.dart';
 import 'package:radency_internship_project_2/repositories/budgets_repository.dart';
@@ -60,12 +61,14 @@ class App extends StatelessWidget {
     required this.budgetsRepository,
     required this.biometricCredentialsService,
     required this.transactionsRepository,
+    required this.apiProvider,
   })  : super(key: key);
 
   final AmplifyAuthenticationService amplifyAuthenticationService;
   final BudgetsRepository budgetsRepository;
   final BiometricCredentialsService biometricCredentialsService;
   final TransactionsRepository transactionsRepository;
+  final AmplifyApiProvider apiProvider;
 
   @override
   Widget build(BuildContext context) {
@@ -105,6 +108,8 @@ class App extends StatelessWidget {
             BlocProvider(create: (_) => CsvExportBloc(transactionsRepository: transactionsRepository)),
             BlocProvider(
               create: (context) => TransactionsDailyBloc(
+                apiProvider: apiProvider,
+                amplifyAuthenticationService: amplifyAuthenticationService,
                 settingsBloc: BlocProvider.of<SettingsBloc>(context),
                 transactionsRepository: transactionsRepository,
               )..add(TransactionsDailyInitialize()),
@@ -129,6 +134,8 @@ class App extends StatelessWidget {
               create: (context) => TransactionsCalendarBloc(
                 settingsBloc: BlocProvider.of<SettingsBloc>(context),
                 transactionsRepository: transactionsRepository,
+                apiProvider: apiProvider,
+                amplifyAuthenticationService: amplifyAuthenticationService,
               )..add(TransactionsCalendarInitialize()),
             ),
             BlocProvider(
@@ -136,6 +143,8 @@ class App extends StatelessWidget {
                 settingsBloc: BlocProvider.of<SettingsBloc>(context),
                 budgetsRepository: budgetsRepository,
                 transactionsRepository: transactionsRepository,
+                amplifyAuthenticationService: amplifyAuthenticationService,
+                apiProvider: apiProvider,
               )..add(BudgetOverviewInitialize()),
             ),
             BlocProvider(create: (context) => TransactionLocationMapBloc()),

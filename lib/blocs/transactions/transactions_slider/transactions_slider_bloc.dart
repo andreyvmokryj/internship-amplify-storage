@@ -2,10 +2,8 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
 
 part 'transactions_slider_event.dart';
-
 part 'transactions_slider_state.dart';
 
 enum TransactionsSliderMode {

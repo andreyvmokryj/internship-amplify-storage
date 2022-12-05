@@ -1,0 +1,34 @@
+# This "input" configures a global authorization rule to enable public access to
+# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
+#input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
+
+#type AppTransaction @model @auth(rules: [{allow: owner, ownerField: "userID",  identityClaim: "cognito:sub" }]) {
+type AppTransaction @model @auth(rules: [{allow: owner, ownerField: "userID"}]) {
+  id: ID!
+  transactionType: TransactionType!
+  date: AWSDateTime!
+  accountOrigin: String!
+  amount: Float!
+  note: String
+  currency: String!
+  subcurrency: String
+  category: String
+  creationType: ExpenseCreationType
+  locationLatitude: Float
+  locationLongitude: Float
+  accountDestination: String
+  fees: Float
+  userID: ID!
+}
+
+enum TransactionType {
+  Income
+  Expense
+  Transfer
+}
+
+enum ExpenseCreationType {
+  IMPORT
+  AI
+  MANUAL
+}

@@ -10,6 +10,8 @@ import 'package:radency_internship_project_2/local_models/budget/category_budget
 import 'package:radency_internship_project_2/local_models/budget/monthly_category_expense.dart';
 import 'package:radency_internship_project_2/models/AppTransaction.dart';
 import 'package:radency_internship_project_2/models/ModelProvider.dart';
+import 'package:radency_internship_project_2/providers/amplify_api_provider.dart';
+import 'package:radency_internship_project_2/providers/amplify_auth_service.dart';
 import 'package:radency_internship_project_2/repositories/budgets_repository.dart';
 import 'package:radency_internship_project_2/repositories/transactions_repository.dart';
 import 'package:radency_internship_project_2/utils/date_helper.dart';
@@ -22,9 +24,13 @@ class BudgetOverviewBloc extends Bloc<BudgetOverviewEvent, BudgetOverviewState> 
   BudgetOverviewBloc({required this.settingsBloc,
     required this.budgetsRepository,
     required this.transactionsRepository,
+    required this.apiProvider,
+    required this.amplifyAuthenticationService,
   }) : super(BudgetOverviewInitial());
 
   final TransactionsRepository transactionsRepository;
+  final AmplifyApiProvider apiProvider;
+  final AmplifyAuthenticationService amplifyAuthenticationService;
 
   SettingsBloc settingsBloc;
   StreamSubscription? settingsSubscription;
@@ -43,11 +49,17 @@ class BudgetOverviewBloc extends Bloc<BudgetOverviewEvent, BudgetOverviewState> 
 
   StreamSubscription? budgetOverviewSubscription;
   StreamSubscription<AuthHubEvent>? _onUserChangedSubscription;
+  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionAddedSubscription;
+  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionChangedSubscription;
+  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionDeletedSubscription;
 
   @override
   Future<void> close() {
     budgetOverviewSubscription?.cancel();
     _onUserChangedSubscription?.cancel();
+    _onTransactionAddedSubscription?.cancel();
+    _onTransactionChangedSubscription?.cancel();
+    _onTransactionDeletedSubscription?.cancel();
     settingsSubscription?.cancel();
 
     return super.close();
@@ -105,7 +117,7 @@ class BudgetOverviewBloc extends Bloc<BudgetOverviewEvent, BudgetOverviewState> 
       }
     });
 
-    add(BudgetOverviewFetchRequested(dateForFetch: _observedDate!));
+    add(BudgetOverviewUserChanged(userId: await amplifyAuthenticationService.getUserID()));
   }
 
   Stream<BudgetOverviewState> _mapBudgetOverviewLocaleChangedToState() async* {
@@ -124,6 +136,11 @@ class BudgetOverviewBloc extends Bloc<BudgetOverviewEvent, BudgetOverviewState> 
   Stream<BudgetOverviewState> _mapBudgetOverviewUserChangedToState(String id) async* {
     yield BudgetOverviewLoading(sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString);
 
+    AmplifyStreamGroup streams = apiProvider.getTransactionsStreams();
+    _onTransactionAddedSubscription = streams.onTransactionAdded.listen(_onTransactionAdded);
+    _onTransactionChangedSubscription = streams.onTransactionChanged.listen(_onTransactionChanged);
+    _onTransactionDeletedSubscription = streams.onTransactionDeleted.listen(_onTransactionDeleted);
+
     _observedDate = DateTime.now();
     add(BudgetOverviewFetchRequested(dateForFetch: _observedDate!));
   }
@@ -133,12 +150,13 @@ class BudgetOverviewBloc extends Bloc<BudgetOverviewEvent, BudgetOverviewState> 
 
     _sliderCurrentTimeIntervalString = DateHelper().monthNameAndYearFromDateTimeString(_observedDate!);
     yield BudgetOverviewLoading(sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString);
-    budgetOverviewSubscription = (await transactionsRepository
+    budgetOverviewSubscription = ( transactionsRepository
         .getTransactionsByTimePeriod(
             start: DateHelper().getFirstDayOfMonth(_observedDate!), end: DateHelper().getLastDayOfMonth(_observedDate!)))
+        .asStream()
         .listen((event) {
       monthlyCategoryExpenses.clear();
-      transactions = event.items;
+      transactions = event;
       add(BudgetOverviewDisplayRequested());
     });
   }
@@ -253,5 +271,48 @@ class BudgetOverviewBloc extends Bloc<BudgetOverviewEvent, BudgetOverviewState> 
     });
 
     return list;
+  }
+
+  _onTransactionAdded(GraphQLResponse<AppTransaction> event) async {
+    print('TransactionsBloc: snapshot ${event.data}');
+    if (event.data == null) {
+      return;
+    }
+
+    AppTransaction transaction = event.data!;
+
+    // TODO: refactor
+    if ((transaction.date.getDateTimeInUtc().isAfter(DateHelper().getFirstDayOfMonth(_observedDate!)) ||
+        transaction.date.getDateTimeInUtc() == DateHelper().getFirstDayOfMonth(_observedDate!)) &&
+        transaction.date.getDateTimeInUtc().isBefore(DateHelper().getLastDayOfMonth(_observedDate!))) {
+      transactions.add(transaction);
+      add(BudgetOverviewDisplayRequested());
+    }
+  }
+
+  _onTransactionChanged(GraphQLResponse<AppTransaction> event) async {
+    if (event.data == null) {
+      return;
+    }
+    AppTransaction changedTransaction = event.data!;
+
+    int oldTransactionIndex = transactions.indexWhere((transaction) => transaction.id == event.data!.id);
+    if (oldTransactionIndex != -1) {
+      transactions[oldTransactionIndex] = changedTransaction;
+    }
+    add(BudgetOverviewDisplayRequested());
+  }
+
+  _onTransactionDeleted(GraphQLResponse<AppTransaction> event) async {
+    if (event.data == null) {
+      return;
+    }
+
+    int index = transactions.indexWhere((transaction) => transaction.id == event.data!.id);
+    if (index != -1) {
+      transactions.removeAt(index);
+    }
+
+    add(BudgetOverviewDisplayRequested());
   }
 }

@@ -112,13 +112,14 @@ class ExpensesChartBloc extends Bloc<ExpensesChartEvent, ExpensesChartState> {
 
     _sliderCurrentTimeIntervalString = DateHelper().monthNameAndYearFromDateTimeString(_observedDate!);
     yield ExpensesChartLoading(sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString);
-    expensesChartTransactionsSubscription = (await transactionsRepository
+    expensesChartTransactionsSubscription = ( transactionsRepository
         .getTransactionsByTimePeriod(
           start: DateHelper().getFirstDayOfMonth(dateForFetch),
           end: DateHelper().getLastDayOfMonth(dateForFetch),
         ))
+        .asStream()
         .listen((event) {
-      transactions = event.items;
+      transactions = event;
       add(ExpensesChartDisplayRequested(
           transactions: transactions, sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString));
     });

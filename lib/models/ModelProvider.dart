@@ -21,18 +21,16 @@
 
 import 'package:amplify_core/amplify_core.dart';
 import 'AppTransaction.dart';
-import 'User.dart';
 
 export 'AppTransaction.dart';
 export 'ExpenseCreationType.dart';
 export 'TransactionType.dart';
-export 'User.dart';
 
 class ModelProvider implements ModelProviderInterface {
   @override
-  String version = "1f886cad1d1e1f5a3844c95cf4793f24";
+  String version = "1a0e86929f0f3014db3f836f1b2907c8";
   @override
-  List<ModelSchema> modelSchemas = [AppTransaction.schema, User.schema];
+  List<ModelSchema> modelSchemas = [AppTransaction.schema];
   static final ModelProvider _instance = ModelProvider();
   @override
   List<ModelSchema> customTypeSchemas = [];
@@ -43,8 +41,6 @@ class ModelProvider implements ModelProviderInterface {
     switch(modelName) {
       case "AppTransaction":
         return AppTransaction.classType;
-      case "User":
-        return User.classType;
       default:
         throw Exception("Failed to find model in model provider for model name: " + modelName);
     }

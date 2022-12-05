@@ -1,4 +1,4 @@
-import 'package:amplify_datastore/amplify_datastore.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:radency_internship_project_2/blocs/transactions/add_transaction/temp_values.dart';
 import 'package:radency_internship_project_2/models/ExpenseCreationType.dart';
 import 'package:radency_internship_project_2/models/ModelProvider.dart';
