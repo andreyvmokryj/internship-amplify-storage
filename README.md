@@ -1,9 +1,27 @@
-# radency_internship_project_2
+# Amplify GraphQL API
+### Connect to existing Amplify project 
 
-### Firebase test phone auth profiles
-To add or view available combinations of test phone numbers and predefined OTP codes visit 
-https://console.firebase.google.com/u/0/project/radency-internship-2-yokoy/authentication/providers, select Phone provider section, and open "Phone numbers for testing
- (optional)" menu.
+```
+amplify pull --appId <AMPLIFY_APP_ID> --envName <ENVIRONMENT>
+```
 
-Default test profile: number +12345678901, otp 111111.
-Consider creating new test profile for your needs.
+### Pull further updates 
+
+```
+amplify pull
+```
+
+### Push local updates (any changes to 'amplify' directory)
+
+```
+amplify push
+```
+
+### Generate Amplify models
+
+```
+amplify codegen <PATH_TO_MODELS_DIR>
+```
+
+
+
