@@ -134,6 +134,8 @@ class App extends StatelessWidget {
               create: (context) => TransactionsCalendarBloc(
                 settingsBloc: BlocProvider.of<SettingsBloc>(context),
                 transactionsRepository: transactionsRepository,
+                apiProvider: apiProvider,
+                amplifyAuthenticationService: amplifyAuthenticationService,
               )..add(TransactionsCalendarInitialize()),
             ),
             BlocProvider(
@@ -141,6 +143,8 @@ class App extends StatelessWidget {
                 settingsBloc: BlocProvider.of<SettingsBloc>(context),
                 budgetsRepository: budgetsRepository,
                 transactionsRepository: transactionsRepository,
+                amplifyAuthenticationService: amplifyAuthenticationService,
+                apiProvider: apiProvider,
               )..add(BudgetOverviewInitialize()),
             ),
             BlocProvider(create: (context) => TransactionLocationMapBloc()),

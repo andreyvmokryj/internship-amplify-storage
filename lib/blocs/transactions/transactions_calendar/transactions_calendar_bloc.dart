@@ -7,6 +7,8 @@ import 'package:radency_internship_project_2/blocs/settings/settings_bloc.dart';
 import 'package:radency_internship_project_2/local_models/calendar_day.dart';
 import 'package:radency_internship_project_2/models/AppTransaction.dart';
 import 'package:radency_internship_project_2/models/ModelProvider.dart';
+import 'package:radency_internship_project_2/providers/amplify_api_provider.dart';
+import 'package:radency_internship_project_2/providers/amplify_auth_service.dart';
 import 'package:radency_internship_project_2/repositories/transactions_repository.dart';
 import 'package:radency_internship_project_2/utils/date_helper.dart';
 
@@ -18,9 +20,13 @@ class TransactionsCalendarBloc extends Bloc<TransactionsCalendarEvent, Transacti
   TransactionsCalendarBloc({
     required this.settingsBloc,
     required this.transactionsRepository,
+    required this.amplifyAuthenticationService,
+    required this.apiProvider,
   }) : super(TransactionsCalendarInitial());
 
   final TransactionsRepository transactionsRepository;
+  final AmplifyApiProvider apiProvider;
+  final AmplifyAuthenticationService amplifyAuthenticationService;
 
   SettingsBloc settingsBloc;
   StreamSubscription? settingsSubscription;
@@ -40,6 +46,9 @@ class TransactionsCalendarBloc extends Bloc<TransactionsCalendarEvent, Transacti
   final int endOfWeek = 7;
 
   StreamSubscription? calendarTransactionsSubscription;
+  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionAddedSubscription;
+  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionChangedSubscription;
+  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionDeletedSubscription;
   StreamSubscription<AuthHubEvent>? _onUserChangedSubscription;
 
   @override
@@ -71,15 +80,22 @@ class TransactionsCalendarBloc extends Bloc<TransactionsCalendarEvent, Transacti
   Future<void> close() {
     calendarTransactionsSubscription?.cancel();
     settingsSubscription?.cancel();
+    _onTransactionChangedSubscription?.cancel();
+    _onTransactionAddedSubscription?.cancel();
+    _onTransactionDeletedSubscription?.cancel();
     _onUserChangedSubscription?.cancel();
     return super.close();
   }
 
   Stream<TransactionsCalendarState> _mapTransactionsCalendarInitializeToState() async* {
     _observedDate = DateTime.now();
-    add(TransactionsCalendarFetchRequested(dateForFetch: _observedDate!));
+    add(TransactionsCalendarUserChanged(id: await amplifyAuthenticationService.getUserID()));
 
     _onUserChangedSubscription = Amplify.Hub.listen(HubChannel.Auth, (hubEvent) {
+      _onTransactionChangedSubscription?.cancel();
+      _onTransactionAddedSubscription?.cancel();
+      _onTransactionDeletedSubscription?.cancel();
+
       if (hubEvent.payload == null) {
         calendarData.clear();
         transactionsList.clear();
@@ -148,6 +164,11 @@ class TransactionsCalendarBloc extends Bloc<TransactionsCalendarEvent, Transacti
 
   Stream<TransactionsCalendarState> _mapTransactionsCalendarUserChangedToState(String id) async* {
     yield TransactionsCalendarLoading(sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString);
+
+    AmplifyStreamGroup streams = apiProvider.getTransactionsStreams();
+    _onTransactionAddedSubscription = streams.onTransactionAdded.listen(_onTransactionAdded);
+    _onTransactionChangedSubscription = streams.onTransactionChanged.listen(_onTransactionChanged);
+    _onTransactionDeletedSubscription = streams.onTransactionDeleted.listen(_onTransactionDeleted);
 
     _observedDate = DateTime.now();
     add(TransactionsCalendarFetchRequested(dateForFetch: _observedDate!));
@@ -222,5 +243,66 @@ class TransactionsCalendarBloc extends Bloc<TransactionsCalendarEvent, Transacti
     }
 
     return days;
+  }
+
+  _onTransactionAdded(GraphQLResponse<AppTransaction> event) async {
+    print('TransactionsBloc: snapshot ${event.data}');
+    if (event.data == null) {
+      return;
+    }
+
+    AppTransaction transaction = event.data!;
+
+    // TODO: refactor
+    if ((transaction.date.getDateTimeInUtc().isAfter(DateHelper().getFirstDayOfMonth(_observedDate!)) ||
+        transaction.date.getDateTimeInUtc() == DateHelper().getFirstDayOfMonth(_observedDate!)) &&
+        transaction.date.getDateTimeInUtc().isBefore(DateHelper().getLastDayOfMonth(_observedDate!))) {
+      transactionsList.add(transaction);
+      calendarData = _convertTransactionsToCalendarData(transactionsList, _observedDate!);
+      add(TransactionsCalendarDisplayRequested(
+        daysData: calendarData,
+        sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString,
+        expensesSummary: expensesSummary,
+        incomeSummary: incomeSummary,
+      ));
+    }
+  }
+
+  _onTransactionChanged(GraphQLResponse<AppTransaction> event) async {
+    if (event.data == null) {
+      return;
+    }
+    AppTransaction changedTransaction = event.data!;
+
+    int oldTransactionIndex = transactionsList.indexWhere((transaction) => transaction.id == event.data!.id);
+    if (oldTransactionIndex != -1) {
+      transactionsList[oldTransactionIndex] = changedTransaction;
+    }
+    calendarData = _convertTransactionsToCalendarData(transactionsList, _observedDate!);
+    add(TransactionsCalendarDisplayRequested(
+      daysData: calendarData,
+      sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString,
+      expensesSummary: expensesSummary,
+      incomeSummary: incomeSummary,
+    ));
+  }
+
+  _onTransactionDeleted(GraphQLResponse<AppTransaction> event) async {
+    if (event.data == null) {
+      return;
+    }
+
+    int index = transactionsList.indexWhere((transaction) => transaction.id == event.data!.id);
+    if (index != -1) {
+      transactionsList.removeAt(index);
+    }
+
+    calendarData = _convertTransactionsToCalendarData(transactionsList, _observedDate!);
+    add(TransactionsCalendarDisplayRequested(
+      daysData: calendarData,
+      sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString,
+      expensesSummary: expensesSummary,
+      incomeSummary: incomeSummary,
+    ));
   }
 }

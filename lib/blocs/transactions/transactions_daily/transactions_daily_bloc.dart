@@ -6,7 +6,6 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:radency_internship_project_2/blocs/settings/settings_bloc.dart';
-import 'package:radency_internship_project_2/local_models/transactions/transactions_helper.dart';
 import 'package:radency_internship_project_2/models/AppTransaction.dart';
 import 'package:radency_internship_project_2/providers/amplify_api_provider.dart';
 import 'package:radency_internship_project_2/providers/amplify_auth_service.dart';
@@ -107,8 +106,6 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
       }
     });
 
-    add(TransactionsDailyFetchRequested(dateForFetch: _observedDate!));
-
     add(TransactionDailyUserChanged(id: (await amplifyAuthenticationService.getUserID())));
   }
 
@@ -187,21 +184,6 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
 
     return map;
   }
-
-  // void subscribe()  {
-  //   final onTransactionAddedRequest = ModelSubscriptions.onCreate(AppTransaction.classType);
-  //   final Stream<GraphQLResponse<AppTransaction>> addOperation = Amplify.API.subscribe(
-  //     onTransactionAddedRequest,
-  //     onEstablished: () => print('Subscription on added established'),
-  //   );
-  //   _onTransactionAddedSubscription = addOperation.listen(
-  //         (event) {
-  //           /// TODO: handle on add event
-  //       print('Subscription event data received: ${event.data}');
-  //     },
-  //     onError: (Object e) => print('Error in subscription stream: $e'),
-  //   );
-  // }
 
   _onTransactionAdded(GraphQLResponse<AppTransaction> event) async {
     print('TransactionsBloc: snapshot ${event.data}');
