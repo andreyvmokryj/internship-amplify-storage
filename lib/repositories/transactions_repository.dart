@@ -17,7 +17,6 @@ class TransactionsRepository extends IRepository<AppTransaction> {
     try {
       String uid = await amplifyAuthenticationService.getUserID();
       final request = ModelMutations.create(transaction.copyWith(userID: uid));
-      // await Amplify.DataStore.save(transaction.copyWith(userID: uid));
       final response = await Amplify.API
           .mutate(request: request)
           .response;
@@ -38,37 +37,19 @@ class TransactionsRepository extends IRepository<AppTransaction> {
     String uid = await amplifyAuthenticationService.getUserID();
     final snapshot = await find(transactionID: transactionID);
     if (snapshot != null && snapshot.userID == uid) {
-      // await Amplify.DataStore.delete(snapshot);
       final request = ModelMutations.deleteById(AppTransaction.classType, transactionID!);
       final response = await Amplify.API.mutate(request: request).response;
       print('Response: $response');
     }
-
-    // String uid = await amplifyAuthenticationService.getUserID();
-    // final request = ModelMutations.deleteById(uid);
-    // final response = await Amplify.API.mutate(request: request).response;
-    // print('Response: $response');
   }
 
   @override
   Future<AppTransaction?> find({String? transactionID}) async {
-    // String uid = await amplifyAuthenticationService.getUserID();
-    // final snapshot = await Amplify.DataStore.query(
-    //   AppTransaction.classType,
-    //   where: AppTransaction.ID.eq(transactionID)
-    //       .and(AppTransaction.USERID.eq(uid))
-    // );
-    //
-    // return snapshot.firstOrNull;
-
     try {
       String uid = await amplifyAuthenticationService.getUserID();
       final request = ModelQueries.get(AppTransaction.classType, transactionID!);
       final response = await Amplify.API.query(request: request).response;
       final result = response.data;
-      // if (result == null) {
-      //   print('errors: ${response.errors}');
-      // }
       if (result?.userID != null && result!.userID == uid) {
         return result;
       } else {
@@ -84,7 +65,6 @@ class TransactionsRepository extends IRepository<AppTransaction> {
   Future<void> update({AppTransaction? transaction}) async {
     String uid = await amplifyAuthenticationService.getUserID();
     if (transaction!.userID == uid) {
-      // await Amplify.DataStore.save(transaction);
       final request = ModelMutations.update(transaction);
       final response = await Amplify.API.mutate(request: request).response;
       print('Response: $response');
@@ -113,14 +93,6 @@ class TransactionsRepository extends IRepository<AppTransaction> {
       print('Query failed: $e');
     }
     return [];
-
-    // final snapshot = Amplify.DataStore.observeQuery(
-    //     AppTransaction.classType,
-    //     where: AppTransaction.USERID.eq(uid)
-    //         .and(AppTransaction.DATE.between(_start, _end))
-    // );
-    //
-    // return snapshot;
   }
 
   Future<List<AppTransaction?>> getAllData() async {
@@ -141,11 +113,5 @@ class TransactionsRepository extends IRepository<AppTransaction> {
       print('Query failed: $e');
     }
     return [];
-
-    // final snapshot = await Amplify.DataStore.query(
-    //   AppTransaction.classType,
-    //   where: AppTransaction.USERID.eq(uid)
-    // );
-    // return snapshot;
   }
 }

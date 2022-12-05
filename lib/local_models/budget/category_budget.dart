@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:meta/meta.dart';
 import 'package:radency_internship_project_2/providers/hive/hive_types.dart';
 
 part 'category_budget.g.dart';

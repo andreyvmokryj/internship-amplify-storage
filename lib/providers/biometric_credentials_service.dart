@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:meta/meta.dart';
 
 import 'hive/hive_provider.dart';
 
