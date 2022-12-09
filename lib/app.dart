@@ -2,7 +2,6 @@ import 'package:amplify_authenticator/amplify_authenticator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:radency_internship_project_2/blocs/accounts/account_bloc.dart';
 import 'package:radency_internship_project_2/blocs/export_csv/export_csv_bloc.dart';
 import 'package:radency_internship_project_2/blocs/forex/forex_bloc.dart';
 import 'package:radency_internship_project_2/blocs/image_picker/image_picker_bloc.dart';
@@ -169,9 +168,6 @@ class App extends StatelessWidget {
             ),
             BlocProvider(
               create: (context) => CategorySliderBloc()..add(CategorySliderInitialize()),
-            ),
-            BlocProvider(
-              create: (context) => AccountBloc()..add(FetchAccounts()),
             ),
             BlocProvider(
               create: (context) => SubCurrencyBloc()..add(SubCurrencyInitialize()),

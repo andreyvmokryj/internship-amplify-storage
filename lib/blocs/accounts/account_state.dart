@@ -1,4 +1,4 @@
-part of 'account_bloc.dart';
+import 'package:equatable/equatable.dart';
 
 class AccountState extends Equatable{
   final List<String> accounts;

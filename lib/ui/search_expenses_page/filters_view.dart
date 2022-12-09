@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:radency_internship_project_2/blocs/accounts/account_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:radency_internship_project_2/blocs/accounts/account_notifier.dart';
+import 'package:radency_internship_project_2/blocs/accounts/account_state.dart';
 import 'package:radency_internship_project_2/blocs/settings/category/category_bloc.dart';
 import 'package:radency_internship_project_2/blocs/transactions/search_transactions/search_transactions_bloc.dart';
 import 'package:radency_internship_project_2/generated/l10n.dart';
@@ -14,12 +17,12 @@ import 'package:radency_internship_project_2/ui/widgets/centered_scroll_view.dar
 import 'package:radency_internship_project_2/utils/strings.dart';
 import 'package:radency_internship_project_2/utils/styles.dart';
 
-class FiltersView extends StatefulWidget {
+class FiltersView extends ConsumerStatefulWidget {
   @override
   _FiltersViewState createState() => _FiltersViewState();
 }
 
-class _FiltersViewState extends State<FiltersView> {
+class _FiltersViewState extends ConsumerState<FiltersView> {
   static final GlobalKey<FormState> _accountValueFormKey = GlobalKey<FormState>();
   static final GlobalKey<FormState> _categoryValueFormKey = GlobalKey<FormState>();
   static final GlobalKey<FormState> _minAmountValueFormKey = GlobalKey<FormState>();
@@ -40,10 +43,13 @@ class _FiltersViewState extends State<FiltersView> {
 
   @override
   void initState() {
-    _accountFieldController.text = BlocProvider.of<AccountBloc>(context).state.appliedAccounts.join("; ");
     _categoryFieldController.text = BlocProvider.of<CategoryBloc>(context).state.appliedCategories.join("; ");
     AddTransactionFields.values.forEach((element) {
       focusMap[element] = false;
+    });
+
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(accountsProvider.notifier).fetchAccounts();
     });
     super.initState();
   }
@@ -52,11 +58,6 @@ class _FiltersViewState extends State<FiltersView> {
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
-        BlocListener<AccountBloc, AccountState>(
-          listener: (context, accountState) {
-            _accountFieldController.text = accountState.appliedAccounts.join("; ");
-          },
-        ),
         BlocListener<CategoryBloc, CategoryState>(
           listener: (context, categoryState) {
             _categoryFieldController.text = categoryState.appliedCategories.join("; ");
@@ -93,7 +94,7 @@ class _FiltersViewState extends State<FiltersView> {
             key: _accountValueFormKey,
             child: TextFormField(
               decoration: addTransactionFormFieldDecoration(context, focused: focusMap[AddTransactionFields.Account] ?? false),
-              controller: _accountFieldController,
+              controller: _accountFieldController..text = accountState().appliedAccounts.join("; "),
               readOnly: true,
               showCursor: false,
               onTap: () async {
@@ -131,7 +132,8 @@ class _FiltersViewState extends State<FiltersView> {
                   focusOnField(focusMap, AddTransactionFields.Category);
                 });
                 // List list = await showMultiChoiceModal(context: context, type: MultiChoiceModalType.Category);
-                _categoryFieldController.text = "";
+                await showMultiChoiceModal(context: context, type: MultiChoiceModalType.Category);
+                // _categoryFieldController.text = "";
               },
             ),
           ),
@@ -226,10 +228,14 @@ class _FiltersViewState extends State<FiltersView> {
           BlocProvider.of<SearchTransactionsBloc>(context).add(SearchTransactionsByFilters(
             minAmount: _minAmountValue,
             maxAmount: _maxAmountValue,
-            accounts: BlocProvider.of<AccountBloc>(context).state.selectedAccounts,
+            accounts: accountState().selectedAccounts,
             categories: BlocProvider.of<CategoryBloc>(context).state.selectedCategories,
           ));
         });
+  }
+
+  AccountState accountState(){
+    return ref.watch(accountsProvider);
   }
 
   void updateMinAmountCallback(var value) {
