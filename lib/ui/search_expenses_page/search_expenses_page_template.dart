@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:radency_internship_project_2/blocs/accounts/account_bloc.dart';
+import 'package:radency_internship_project_2/blocs/accounts/account_notifier.dart';
 import 'package:radency_internship_project_2/blocs/settings/settings_bloc.dart';
 import 'package:radency_internship_project_2/blocs/transactions/search_transactions/search_transactions_bloc.dart';
 import 'package:radency_internship_project_2/generated/l10n.dart';
@@ -10,18 +13,23 @@ import 'package:radency_internship_project_2/ui/search_expenses_page/summary_row
 import 'package:radency_internship_project_2/ui/search_expenses_page/transaction_widget.dart';
 import 'package:radency_internship_project_2/ui/shared_components/design_scaffold.dart';
 
-class SearchExpensesPage extends StatefulWidget{
+class SearchExpensesPage extends ConsumerStatefulWidget{
   @override
   _SearchExpensesPageState createState() => _SearchExpensesPageState();
 }
 
-class _SearchExpensesPageState extends State<SearchExpensesPage> {
+class _SearchExpensesPageState extends ConsumerState<SearchExpensesPage> {
   bool showFilters = true;
 
   @override
   void initState() {
     BlocProvider.of<SearchTransactionsBloc>(context).add(SearchTransactionsInitialize());
-    BlocProvider.of<AccountBloc>(context).add(FetchAccounts());
+    // BlocProvider.of<AccountBloc>(context).add(FetchAccounts());
+    // ref.read(accountsProvider.notifier).fetchAccounts();
+
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(accountsProvider.notifier).fetchAccounts();
+    });
     super.initState();
   }
 
