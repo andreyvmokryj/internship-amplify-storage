@@ -1,20 +1,16 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:radency_internship_project_2/utils/routes.dart';
 import 'package:radency_internship_project_2/utils/text_styles.dart';
 
-class OnboardingPage extends StatefulWidget {
-  @override
-  State createState() => OnboardingPageState();
-}
-
-class OnboardingPageState extends State<OnboardingPage> {
+class OnboardingPage extends HookConsumerWidget {
 
   final controller = PageController();
   static const duration = const Duration(milliseconds: 300);
   static const curve = Curves.ease;
 
-  singleScreen({imagePath, titleText, mainText}) {
+  singleScreen({required BuildContext context, imagePath, titleText, mainText}) {
     return ConstrainedBox(
       constraints: const BoxConstraints.expand(),
       child: Stack(children: [
@@ -45,7 +41,7 @@ class OnboardingPageState extends State<OnboardingPage> {
       ]),
     );
   }
-  selectPage(pagesCount) => (page) {
+  selectPage(BuildContext context, pagesCount) => (page) {
     if(page > pagesCount) {
       controller.animateToPage(
         0, 
@@ -61,17 +57,20 @@ class OnboardingPageState extends State<OnboardingPage> {
     }
   };
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ref) {
     final List<Widget> pages = [
       singleScreen(
+        context: context,
         imagePath: "assets/images/cool_kids_high_tech.png", 
         titleText: 'Your personal money manager',
         mainText: 'The best financial assistant for\nyour expenses'),
       singleScreen(
+        context: context,
         imagePath: "assets/images/cool_kids_long_distance_relationship.png", 
         titleText: 'Planning from every corner',
         mainText: 'Plan and track your finances without\nleaving your home.'),
       singleScreen(
+        context: context,
         imagePath: "assets/images/cool_kids_study.png", 
         titleText: 'All features on one device',
         mainText: 'Enjoy unlimited functions with no ads\nand other distracting things.'),
@@ -80,7 +79,7 @@ class OnboardingPageState extends State<OnboardingPage> {
       body: Stack(
           children: <Widget>[
             PageView.builder(
-              onPageChanged: selectPage(pages.length - 1),
+              onPageChanged: selectPage(context, pages.length - 1),
               physics: BouncingScrollPhysics(),
               controller: controller,
               itemBuilder: (BuildContext context, int index) {
@@ -97,7 +96,7 @@ class OnboardingPageState extends State<OnboardingPage> {
                   controller: controller,
                   itemCount: pages.length,
                   color: Theme.of(context).colorScheme.secondary,
-                  onPageSelected: selectPage(pages.length - 1),
+                  onPageSelected: selectPage(context,pages.length - 1),
                 ),
               ),
             ),
