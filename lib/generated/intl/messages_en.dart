@@ -148,6 +148,10 @@ class MessageLookup extends MessageLookupByLibrary {
         "januaryShort": MessageLookupByLibrary.simpleMessage("Jan."),
         "julyShort": MessageLookupByLibrary.simpleMessage("Jul."),
         "juneShort": MessageLookupByLibrary.simpleMessage("Jun."),
+        "kioskCategoryTitle":
+            MessageLookupByLibrary.simpleMessage("Kiosk mode"),
+        "kioskModeOff": MessageLookupByLibrary.simpleMessage("off"),
+        "kioskModeOn": MessageLookupByLibrary.simpleMessage("on"),
         "language": MessageLookupByLibrary.simpleMessage("Language"),
         "lightTheme": MessageLookupByLibrary.simpleMessage("Light Theme"),
         "loginButton": MessageLookupByLibrary.simpleMessage("LOGIN"),

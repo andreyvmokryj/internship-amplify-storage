@@ -62,9 +62,8 @@ class AppSettingsList extends StatelessWidget {
                     },
                   ),
                   SettingsTile(
-                    // title: Text(S.current.expensesCategoryTitle),
-                    title: Text("Kiosk mode"),
-                    description: Text(mode == KioskMode.enabled ? "on" : "off"),
+                    title: Text(S.current.kioskCategoryTitle),
+                    description: Text(mode == KioskMode.enabled ? S.current.kioskModeOn : S.current.kioskModeOff),
                     leading: Icon(FontAwesome5Solid.lock),
                     trailing: Switch(
                       value: mode == KioskMode.enabled,
