@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kiosk_mode/kiosk_mode.dart';
 import 'package:radency_internship_project_2/blocs/settings/settings_bloc.dart';
-import 'package:radency_internship_project_2/utils/kiosk.dart';
+import 'package:radency_internship_project_2/utils/kiosk_utils.dart';
 import 'package:radency_internship_project_2/utils/routes.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:radency_internship_project_2/generated/l10n.dart';
