@@ -1410,6 +1410,36 @@ class S {
     );
   }
 
+  /// `Kiosk mode`
+  String get kioskCategoryTitle {
+    return Intl.message(
+      'Kiosk mode',
+      name: 'kioskCategoryTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `on`
+  String get kioskModeOn {
+    return Intl.message(
+      'on',
+      name: 'kioskModeOn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `off`
+  String get kioskModeOff {
+    return Intl.message(
+      'off',
+      name: 'kioskModeOff',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Delete`
   String get delete {
     return Intl.message(

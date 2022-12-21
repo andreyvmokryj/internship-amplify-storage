@@ -160,6 +160,9 @@
 
   "incomeCategoryTitle": "Income",
   "expensesCategoryTitle": "Expenses",
+  "kioskCategoryTitle": "Kiosk mode",
+  "kioskModeOn": "on",
+  "kioskModeOff": "off",
   "delete": "Delete",
   "edit": "Edit",
   "save": "Save",

@@ -180,6 +180,9 @@
 
   "incomeCategoryTitle": "Категории доходов",
   "expensesCategoryTitle": "Категории расходов",
+  "kioskCategoryTitle": "Закрепить",
+  "kioskModeOn": "вкл",
+  "kioskModeOff": "откл",
   "delete": "Удалить",
   "edit": "Редактировать",
   "save": "Сохранить",
