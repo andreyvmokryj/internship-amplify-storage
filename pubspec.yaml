@@ -64,6 +64,7 @@ dependencies:
   pinput: 2.2.16
   hooks_riverpod: 2.1.1
   kiosk_mode: 0.2.2
+  rive: 0.9.1
 
   # Amplify
   amplify_flutter: ^1.0.0-next.1+1
@@ -90,6 +91,7 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - assets/animations/
 
   fonts:
     - family: Nunito

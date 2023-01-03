@@ -5,6 +5,7 @@ import 'package:radency_internship_project_2/blocs/transactions/transactions_sli
 import 'package:radency_internship_project_2/generated/l10n.dart';
 import 'package:radency_internship_project_2/ui/shared_components/design_scaffold.dart';
 import 'package:radency_internship_project_2/ui/shared_components/design_transactions_header.dart';
+import 'package:radency_internship_project_2/ui/widgets/animated_bear.dart';
 import 'package:radency_internship_project_2/ui/widgets/bottom_nav_bar.dart';
 import 'package:radency_internship_project_2/ui/widgets/transactions_view/transactions_content.dart';
 import 'package:radency_internship_project_2/utils/routes.dart';
@@ -53,6 +54,7 @@ class _TransactionsViewState extends State<TransactionsView>  with SingleTickerP
         appBar: AppBar(
           title: Text(S.current.home),
           actions: <Widget>[
+            AnimatedBearWidget(),
             IconButton(
               icon: const Icon(Icons.search),
               onPressed: (){

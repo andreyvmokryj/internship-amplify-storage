@@ -2,11 +2,13 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:radency_internship_project_2/blocs/settings/settings_bloc.dart';
 import 'package:radency_internship_project_2/blocs/transactions/add_transaction/add_transaction_bloc.dart';
 import 'package:radency_internship_project_2/generated/l10n.dart';
 import 'package:radency_internship_project_2/models/AppTransaction.dart';
 import 'package:radency_internship_project_2/models/TransactionType.dart';
+import 'package:radency_internship_project_2/riverpods/bear_notifier.dart';
 import 'package:radency_internship_project_2/ui/shared_components/modals/amount/amount_modal.dart';
 import 'package:radency_internship_project_2/ui/shared_components/modals/amount/amount_currency_prefix.dart';
 import 'package:radency_internship_project_2/ui/shared_components/elevated_buttons/colored_elevated_button.dart';
@@ -18,12 +20,12 @@ import 'package:radency_internship_project_2/utils/styles.dart';
 import 'package:radency_internship_project_2/utils/ui_utils.dart';
 import 'package:radency_internship_project_2/utils/update_forex.dart';
 
-class AddIncomeForm extends StatefulWidget {
+class AddIncomeForm extends ConsumerStatefulWidget {
   @override
   _AddIncomeFormState createState() => _AddIncomeFormState();
 }
 
-class _AddIncomeFormState extends State<AddIncomeForm> {
+class _AddIncomeFormState extends ConsumerState<AddIncomeForm> {
   static final GlobalKey<FormState> _accountValueFormKey = GlobalKey<FormState>();
   static final GlobalKey<FormState> _categoryValueFormKey = GlobalKey<FormState>();
   static final GlobalKey<FormState> _amountValueFormKey = GlobalKey<FormState>();
@@ -69,6 +71,7 @@ class _AddIncomeFormState extends State<AddIncomeForm> {
         if (state is AddTransactionSuccessfulAndCompleted) {
           showSnackBarMessage(context, S.current.addTransactionSnackBarSuccessMessage);
           Navigator.of(context).pop();
+          ref.read(bearProvider.notifier).toggleSuccess();
         }
       },
       builder: (context, state) {
