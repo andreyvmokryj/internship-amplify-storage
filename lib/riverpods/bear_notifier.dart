@@ -15,6 +15,18 @@ class BearNotifier extends StateNotifier<BearState> {
     await Future.delayed(Duration(seconds: 3));
     state = BearStateInitial();
   }
+
+  void toggleHandsUp() {
+    state = BearStateHandsUp();
+  }
+
+  void toggleHandsDown() async {
+    state = BearStateHandsDown();
+  }
+
+  void toggleInitial() async {
+    state = BearStateInitial();
+  }
 }
 
 final bearProvider = StateNotifierProvider<BearNotifier, BearState>((ref) {

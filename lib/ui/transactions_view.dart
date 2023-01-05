@@ -1,8 +1,10 @@
 import 'package:amplify_authenticator/amplify_authenticator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:radency_internship_project_2/blocs/transactions/transactions_slider/transactions_slider_bloc.dart';
 import 'package:radency_internship_project_2/generated/l10n.dart';
+import 'package:radency_internship_project_2/riverpods/bear_notifier.dart';
 import 'package:radency_internship_project_2/ui/shared_components/design_scaffold.dart';
 import 'package:radency_internship_project_2/ui/shared_components/design_transactions_header.dart';
 import 'package:radency_internship_project_2/ui/widgets/animated_bear.dart';
@@ -10,13 +12,15 @@ import 'package:radency_internship_project_2/ui/widgets/bottom_nav_bar.dart';
 import 'package:radency_internship_project_2/ui/widgets/transactions_view/transactions_content.dart';
 import 'package:radency_internship_project_2/utils/routes.dart';
 
-class TransactionsView extends StatefulWidget {
+class TransactionsView extends ConsumerStatefulWidget {
   @override
   _TransactionsViewState createState() => _TransactionsViewState();
 }
 
-class _TransactionsViewState extends State<TransactionsView>  with SingleTickerProviderStateMixin {
+class _TransactionsViewState extends ConsumerState<TransactionsView>  with SingleTickerProviderStateMixin {
   late TabController tabBarController;
+
+  double coef = 1.0;
 
   @override
   void initState() {
@@ -45,6 +49,26 @@ class _TransactionsViewState extends State<TransactionsView>  with SingleTickerP
     tabBarController = new TabController(length: 5, vsync: this, initialIndex: initialIndex);
     tabBarController.addListener(() {
       context.read<TransactionsSliderBloc>().add(TransactionsSliderModeChanged(index: tabBarController.index));
+    });
+    tabBarController.animation!.addListener(() {
+      double _offset = tabBarController.offset;
+      // if (_offset < -1 || _offset > 1) {
+      //   coef = -1;
+      // }
+      // _offset  *= coef;
+      // if (_offset > 0.0) {
+      //   ref.read(bearProvider.notifier).toggleHandsUp();
+      // }
+      // if (_offset < 0.0) {
+      //   ref.read(bearProvider.notifier).toggleLeft();
+      // }
+
+      if (_offset == 0.0) {
+        coef = 1;
+        ref.read(bearProvider.notifier).toggleHandsDown();
+      } else {
+        ref.read(bearProvider.notifier).toggleHandsUp();
+      }
     });
   }
 

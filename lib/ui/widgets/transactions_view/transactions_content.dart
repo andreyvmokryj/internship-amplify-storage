@@ -17,26 +17,28 @@ class TransactionsContent extends StatefulWidget {
 class _TransactionsContentState extends State<TransactionsContent> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+    return Stack(
+      children: [
+        // GestureDetector(
+        //   onHorizontalDragUpdate: (details) {
+        //     if (details.delta.dx > 0
+        //     // && details.localPosition.dx > 0
+        //     ) {
+        //       print("onHorizontalDragUpdate: Moved right");
+        //     }
+        //   },
+        // ),
+        TabBarView(
+          controller: widget.tabBarController,
           children: [
-            Expanded(
-              child: TabBarView(
-                controller: widget.tabBarController,
-                children: [
-                  DailyTab(),
-                  CalendarTab(),
-                  WeeklyTab(),
-                  MonthlyTab(),
-                  SummaryTab(),
-                ],
-              ),
-            ),
+            DailyTab(),
+            CalendarTab(),
+            WeeklyTab(),
+            MonthlyTab(),
+            SummaryTab(),
           ],
         ),
-      ),
+      ],
     );
   }
 }
