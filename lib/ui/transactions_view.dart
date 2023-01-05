@@ -20,8 +20,6 @@ class TransactionsView extends ConsumerStatefulWidget {
 class _TransactionsViewState extends ConsumerState<TransactionsView>  with SingleTickerProviderStateMixin {
   late TabController tabBarController;
 
-  double coef = 1.0;
-
   @override
   void initState() {
     super.initState();
@@ -52,19 +50,8 @@ class _TransactionsViewState extends ConsumerState<TransactionsView>  with Singl
     });
     tabBarController.animation!.addListener(() {
       double _offset = tabBarController.offset;
-      // if (_offset < -1 || _offset > 1) {
-      //   coef = -1;
-      // }
-      // _offset  *= coef;
-      // if (_offset > 0.0) {
-      //   ref.read(bearProvider.notifier).toggleHandsUp();
-      // }
-      // if (_offset < 0.0) {
-      //   ref.read(bearProvider.notifier).toggleLeft();
-      // }
 
-      if (_offset == 0.0) {
-        coef = 1;
+      if (_offset < 0.001 && _offset > -0.001) {
         ref.read(bearProvider.notifier).toggleHandsDown();
       } else {
         ref.read(bearProvider.notifier).toggleHandsUp();

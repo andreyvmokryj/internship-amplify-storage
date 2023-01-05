@@ -85,7 +85,7 @@ class _AnimatedBearWidgetState extends ConsumerState<AnimatedBearWidget> {
   }
 
   void _toggleDown() async{
-    if (!isMoving() && !movedDown) {
+    if (!movedDown) {
       print("Toggle Down");
       _idleController.isActive = false;
       // _upController.reset();
