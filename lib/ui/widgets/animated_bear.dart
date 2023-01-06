@@ -77,9 +77,8 @@ class _AnimatedBearWidgetState extends ConsumerState<AnimatedBearWidget> {
       _upController.isActive = false;
       _downController.isActive = false;
       await Future.delayed(Duration(milliseconds: 100));
-      _upController.isActive = true;
       setState(() {
-
+        _upController.isActive = true;
       });
     }
   }
@@ -88,16 +87,13 @@ class _AnimatedBearWidgetState extends ConsumerState<AnimatedBearWidget> {
     if (!movedDown) {
       print("Toggle Down");
       _idleController.isActive = false;
-      // _upController.reset();
+      _upController.reset();
       _upController.isActive = false;
       _downController.isActive = false;
-      // await Future.delayed(Duration(milliseconds: 100));
       _downController.reset();
       await Future.delayed(Duration(milliseconds: 100));
-      _downController.isActive = true;
-
       setState(() {
-
+        _downController.isActive = true;
       });
     }
   }
@@ -136,7 +132,6 @@ class _AnimatedBearWidgetState extends ConsumerState<AnimatedBearWidget> {
         _toggleDown();
         break;
       case BearStateInitial:
-        // _toggleInitial();
         break;
     }
 
