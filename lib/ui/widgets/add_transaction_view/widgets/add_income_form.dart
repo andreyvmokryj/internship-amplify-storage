@@ -14,6 +14,7 @@ import 'package:radency_internship_project_2/ui/shared_components/modals/amount/
 import 'package:radency_internship_project_2/ui/shared_components/elevated_buttons/colored_elevated_button.dart';
 import 'package:radency_internship_project_2/ui/shared_components/elevated_buttons/stylized_elevated_button.dart';
 import 'package:radency_internship_project_2/ui/shared_components/modals/single_choice_modals/show_single_choice_modal.dart';
+import 'package:radency_internship_project_2/ui/shared_components/modals/success_dialog.dart';
 import 'package:radency_internship_project_2/utils/date_helper.dart';
 import 'package:radency_internship_project_2/utils/strings.dart';
 import 'package:radency_internship_project_2/utils/styles.dart';
@@ -69,9 +70,10 @@ class _AddIncomeFormState extends ConsumerState<AddIncomeForm> {
         }
 
         if (state is AddTransactionSuccessfulAndCompleted) {
-          showSnackBarMessage(context, S.current.addTransactionSnackBarSuccessMessage);
+          // showSnackBarMessage(context, S.current.addTransactionSnackBarSuccessMessage);
           Navigator.of(context).pop();
           ref.read(bearProvider.notifier).toggleSuccess();
+          showSuccessDialog(context);
         }
       },
       builder: (context, state) {
