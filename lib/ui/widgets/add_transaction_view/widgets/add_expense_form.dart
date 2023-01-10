@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:radency_internship_project_2/blocs/settings/settings_bloc.dart';
 import 'package:radency_internship_project_2/blocs/transactions/add_transaction/add_transaction_bloc.dart';
@@ -16,11 +17,13 @@ import 'package:radency_internship_project_2/local_models/location.dart';
 import 'package:radency_internship_project_2/models/AppTransaction.dart';
 import 'package:radency_internship_project_2/models/ExpenseCreationType.dart';
 import 'package:radency_internship_project_2/models/ModelProvider.dart';
+import 'package:radency_internship_project_2/riverpods/bear_notifier.dart';
 import 'package:radency_internship_project_2/ui/shared_components/modals/amount/amount_currency_prefix.dart';
 import 'package:radency_internship_project_2/ui/shared_components/elevated_buttons/colored_elevated_button.dart';
 import 'package:radency_internship_project_2/ui/shared_components/field_title.dart';
 import 'package:radency_internship_project_2/ui/shared_components/elevated_buttons/stylized_elevated_button.dart';
 import 'package:radency_internship_project_2/ui/shared_components/modals/single_choice_modals/show_single_choice_modal.dart';
+import 'package:radency_internship_project_2/ui/shared_components/modals/success_dialog.dart';
 import 'package:radency_internship_project_2/utils/date_helper.dart';
 import 'package:radency_internship_project_2/ui/widgets/add_transaction_view/widgets/add_income_form.dart';
 import 'package:radency_internship_project_2/utils/routes.dart';
@@ -29,12 +32,12 @@ import 'package:radency_internship_project_2/utils/styles.dart';
 import 'package:radency_internship_project_2/utils/ui_utils.dart';
 import 'package:radency_internship_project_2/utils/update_forex.dart';
 
-class AddExpenseForm extends StatefulWidget {
+class AddExpenseForm extends ConsumerStatefulWidget {
   @override
   _AddExpenseFormState createState() => _AddExpenseFormState();
 }
 
-class _AddExpenseFormState extends State<AddExpenseForm> {
+class _AddExpenseFormState extends ConsumerState<AddExpenseForm> {
   static final GlobalKey<FormState> _accountValueFormKey = GlobalKey<FormState>();
   static final GlobalKey<FormState> _categoryValueFormKey = GlobalKey<FormState>();
   static final GlobalKey<FormState> _amountValueFormKey = GlobalKey<FormState>();
@@ -82,8 +85,10 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
         }
 
         if (state is AddTransactionSuccessfulAndCompleted) {
-          showSnackBarMessage(context, S.current.addTransactionSnackBarSuccessMessage);
+          // showSnackBarMessage(context, S.current.addTransactionSnackBarSuccessMessage);
           Navigator.of(context).pop();
+          ref.read(bearProvider.notifier).toggleSuccess();
+          showSuccessDialog(context);
         }
       },
       builder: (context, state) {
