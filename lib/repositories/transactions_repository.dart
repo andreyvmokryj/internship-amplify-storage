@@ -3,6 +3,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:collection/collection.dart';
 import 'package:radency_internship_project_2/models/AppTransaction.dart';
 import 'package:radency_internship_project_2/providers/amplify_auth_service.dart';
+import 'package:radency_internship_project_2/providers/mixpanel_service.dart';
 import 'package:radency_internship_project_2/repositories/repository.dart';
 
 class TransactionsRepository extends IRepository<AppTransaction> {
@@ -27,6 +28,10 @@ class TransactionsRepository extends IRepository<AppTransaction> {
         return;
       }
       safePrint('Mutation result: ${createdItem.toString()}');
+      MixpanelService.instance.track("Transaction Added", properties: {
+        "type" : transaction.transactionType.toString(),
+        "amount" : transaction.amount
+      });
     } on ApiException catch (e) {
       safePrint('Mutation failed: $e');
     }

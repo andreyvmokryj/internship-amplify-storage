@@ -11,6 +11,7 @@ import 'package:radency_internship_project_2/providers/amplify_api_provider.dart
 import 'package:radency_internship_project_2/providers/amplify_auth_service.dart';
 import 'package:radency_internship_project_2/providers/biometric_credentials_service.dart';
 import 'package:radency_internship_project_2/providers/hive/hive_provider.dart';
+import 'package:radency_internship_project_2/providers/mixpanel_service.dart';
 import 'package:radency_internship_project_2/repositories/budgets_repository.dart';
 import 'package:radency_internship_project_2/repositories/transactions_repository.dart';
 
@@ -19,6 +20,7 @@ import 'app.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _configureAmplify();
+  await MixpanelService.init();
 
   var directory = await path_provider.getApplicationDocumentsDirectory();
   await HiveProvider().initializeHive(directory.path);
