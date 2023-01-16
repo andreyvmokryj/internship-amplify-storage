@@ -215,9 +215,12 @@ class CategoryItem extends StatelessWidget {
                             (_, animation) {
                           return SizeTransition(
                             sizeFactor: animation,
-                            child: CategoryItem(
-                              data: data,
-                              categoryType: "",
+                            child: Container(
+                              color: Colors.black26,
+                              child: CategoryItem(
+                                data: data,
+                                categoryType: "",
+                              ),
                             ),
                           );
                         },
