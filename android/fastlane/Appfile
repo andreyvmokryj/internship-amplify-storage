@@ -1,2 +1,2 @@
 json_key_file("keys/service_account_key.json")
-package_name("com.radency.radency_internship_project_2") # e.g. com.krausefx.app
+package_name("com.radency.radency_internship_project_2_mav") # e.g. com.krausefx.app
