@@ -47,6 +47,14 @@ Deploy to Firebase app distribution
 
 
 
+### android incrementAndroidBuildNumber
+
+```sh
+[bundle exec] fastlane android incrementAndroidBuildNumber
+```
+
+
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
