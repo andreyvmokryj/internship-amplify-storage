@@ -48,11 +48,6 @@ platform :android do
   lane :closed_beta do
     begin
       gradle(task: "clean")
-#       increment_build_number(
-#         xcodeproj: "../ios/Runner.xcodeproj",
-# #         skip_info_plist: true
-#       )
-#       incrementAndroidBuildNumber()
       gradle(
         task: "bundle",
         build_type: 'Release',
@@ -68,17 +63,5 @@ platform :android do
         version_code: flutter_version()["version_code"],
       )
     end
-  end
-
-  ### Increment Android Build Number
-  lane :incrementAndroidBuildNumber do
-      path = '../../pubspec.yaml'
-      re = /version:\s+(\d+)/
-      s = File.read(path)
-      versionCode = s[re, 1].to_i
-      s[re, 1] = (versionCode + 1).to_s
-      f = File.new(path, 'w')
-      f.write(s)
-      f.close
   end
 end
