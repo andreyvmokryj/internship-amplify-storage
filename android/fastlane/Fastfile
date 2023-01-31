@@ -44,8 +44,8 @@ platform :android do
     end
   end
 
-  ### Closed beta
-  lane :closed_beta do
+  ### Internal testing
+  lane :internal do
     begin
       gradle(task: "clean")
       gradle(
@@ -54,12 +54,9 @@ platform :android do
         flags: "-Pextra-front-end-options=--no-sound-null-safety"
       )
       upload_to_play_store(
-        track: 'Closed beta',
+        track: 'internal',
         release_status: 'completed',
         aab: '../build/app/outputs/bundle/release/app-release.aab',
-        skip_upload_metadata: true,
-        skip_upload_images: true,
-        skip_upload_screenshots: true,
         version_code: flutter_version()["version_code"],
       )
     end
