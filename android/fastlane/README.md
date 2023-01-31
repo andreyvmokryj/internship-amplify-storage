@@ -39,10 +39,26 @@ Submit a new Beta Build to Crashlytics Beta
 
 Deploy to Firebase app distribution
 
-### android closed_beta
+### android prepare
 
 ```sh
-[bundle exec] fastlane android closed_beta
+[bundle exec] fastlane android prepare
+```
+
+Prepare and archive app
+
+### android internal
+
+```sh
+[bundle exec] fastlane android internal
+```
+
+
+
+### android alpha
+
+```sh
+[bundle exec] fastlane android alpha
 ```
 
 

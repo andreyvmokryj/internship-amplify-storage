@@ -44,15 +44,20 @@ platform :android do
     end
   end
 
+  desc "Prepare and archive app"
+  lane :prepare  do |options|
+    #bundle_install
+    Dir.chdir "../.." do
+      sh("flutter", "clean")
+      sh("flutter", "packages", "get")
+      sh("flutter", "build", "appbundle", "--no-sound-null-safety")
+    end
+  end
+
   ### Internal testing
   lane :internal do
     begin
-      gradle(task: "clean")
-      gradle(
-        task: "bundle",
-        build_type: 'Release',
-        flags: "-Pextra-front-end-options=--no-sound-null-safety"
-      )
+      prepare
       upload_to_play_store(
         track: 'internal',
         release_status: 'completed',
@@ -65,12 +70,7 @@ platform :android do
   ### Alpha
     lane :alpha do
       begin
-        gradle(task: "clean")
-        gradle(
-          task: "bundle",
-          build_type: 'Release',
-          flags: "-Pextra-front-end-options=--no-sound-null-safety"
-        )
+        prepare
         upload_to_play_store(
           track: 'alpha',
           release_status: 'completed',
