@@ -57,8 +57,26 @@ platform :android do
         track: 'internal',
         release_status: 'completed',
         aab: '../build/app/outputs/bundle/release/app-release.aab',
-        version_code: flutter_version()["version_code"],
+        version_code: flutter_version()["version_code"]
       )
     end
   end
+
+  ### Alpha
+    lane :alpha do
+      begin
+        gradle(task: "clean")
+        gradle(
+          task: "bundle",
+          build_type: 'Release',
+          flags: "-Pextra-front-end-options=--no-sound-null-safety"
+        )
+        upload_to_play_store(
+          track: 'alpha',
+          release_status: 'completed',
+          aab: '../build/app/outputs/bundle/release/app-release.aab',
+          version_code: flutter_version()["version_code"]
+        )
+      end
+    end
 end
