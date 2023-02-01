@@ -70,6 +70,7 @@ dependencies:
   logger: 1.1.0
   mixpanel_flutter: 2.0.0
   platform: 3.1.0
+  rxdart: 0.27.7
 
   # Amplify
   amplify_flutter: ^1.0.0-next.1+1
