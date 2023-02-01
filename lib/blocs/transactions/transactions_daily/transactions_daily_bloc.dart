@@ -39,18 +39,12 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
 
   StreamSubscription? dailyTransactionsSubscription;
   StreamSubscription<AuthHubEvent>? _onUserChangedSubscription;
-  // StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionAddedSubscription;
-  // StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionChangedSubscription;
-  // StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionDeletedSubscription;
   StreamSubscription<AmplifyApiEvent>? _onTransactionEventSubscription;
 
   @override
   Future<void> close() {
     dailyTransactionsSubscription?.cancel();
     settingsSubscription?.cancel();
-    // _onTransactionChangedSubscription?.cancel();
-    // _onTransactionAddedSubscription?.cancel();
-    // _onTransactionDeletedSubscription?.cancel();
     _onTransactionEventSubscription?.cancel();
     _onUserChangedSubscription?.cancel();
     return super.close();
@@ -83,9 +77,6 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
     _observedDate = DateTime.now();
 
     _onUserChangedSubscription = Amplify.Hub.listen(HubChannel.Auth, (hubEvent) {
-      // _onTransactionChangedSubscription?.cancel();
-      // _onTransactionAddedSubscription?.cancel();
-      // _onTransactionDeletedSubscription?.cancel();
       _onTransactionEventSubscription?.cancel();
 
       print("${hubEvent.payload?.userId}");
@@ -114,11 +105,6 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
 
   Stream<TransactionsDailyState> _mapTransactionDailyUserChangedToState(String id) async* {
     yield TransactionsDailyLoading(sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString);
-
-    // AmplifyStreamGroup streams = apiProvider.getTransactionsStreams();
-    // _onTransactionAddedSubscription = streams.onTransactionAdded.listen(_onTransactionAdded);
-    // _onTransactionChangedSubscription = streams.onTransactionChanged.listen(_onTransactionChanged);
-    // _onTransactionDeletedSubscription = streams.onTransactionDeleted.listen(_onTransactionDeleted);
 
     Stream<AmplifyApiEvent> stream = apiProvider.getTransactionsStream();
     _onTransactionEventSubscription = stream.listen(_onTransactionEvent);

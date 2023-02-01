@@ -49,17 +49,13 @@ class BudgetOverviewBloc extends Bloc<BudgetOverviewEvent, BudgetOverviewState> 
 
   StreamSubscription? budgetOverviewSubscription;
   StreamSubscription<AuthHubEvent>? _onUserChangedSubscription;
-  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionAddedSubscription;
-  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionChangedSubscription;
-  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionDeletedSubscription;
+  StreamSubscription<AmplifyApiEvent>? _onTransactionEventSubscription;
 
   @override
   Future<void> close() {
     budgetOverviewSubscription?.cancel();
     _onUserChangedSubscription?.cancel();
-    _onTransactionAddedSubscription?.cancel();
-    _onTransactionChangedSubscription?.cancel();
-    _onTransactionDeletedSubscription?.cancel();
+    _onTransactionEventSubscription?.cancel();
     settingsSubscription?.cancel();
 
     return super.close();
@@ -136,10 +132,8 @@ class BudgetOverviewBloc extends Bloc<BudgetOverviewEvent, BudgetOverviewState> 
   Stream<BudgetOverviewState> _mapBudgetOverviewUserChangedToState(String id) async* {
     yield BudgetOverviewLoading(sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString);
 
-    AmplifyStreamGroup streams = apiProvider.getTransactionsStreams();
-    _onTransactionAddedSubscription = streams.onTransactionAdded.listen(_onTransactionAdded);
-    _onTransactionChangedSubscription = streams.onTransactionChanged.listen(_onTransactionChanged);
-    _onTransactionDeletedSubscription = streams.onTransactionDeleted.listen(_onTransactionDeleted);
+    Stream<AmplifyApiEvent> stream = apiProvider.getTransactionsStream();
+    _onTransactionEventSubscription = stream.listen(_onTransactionEvent);
 
     _observedDate = DateTime.now();
     add(BudgetOverviewFetchRequested(dateForFetch: _observedDate!));
@@ -314,5 +308,19 @@ class BudgetOverviewBloc extends Bloc<BudgetOverviewEvent, BudgetOverviewState> 
     }
 
     add(BudgetOverviewDisplayRequested());
+  }
+
+  _onTransactionEvent(AmplifyApiEvent event) async {
+    switch(event.type) {
+      case AmplifyResponseType.add:
+        _onTransactionAdded(event.response);
+        break;
+      case AmplifyResponseType.change:
+        _onTransactionChanged(event.response);
+        break;
+      case AmplifyResponseType.delete:
+        _onTransactionDeleted(event.response);
+        break;
+    }
   }
 }
