@@ -46,9 +46,8 @@ class TransactionsCalendarBloc extends Bloc<TransactionsCalendarEvent, Transacti
   final int endOfWeek = 7;
 
   StreamSubscription? calendarTransactionsSubscription;
-  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionAddedSubscription;
-  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionChangedSubscription;
-  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionDeletedSubscription;
+  StreamSubscription<AmplifyApiEvent>? _onTransactionEventSubscription;
+
   StreamSubscription<AuthHubEvent>? _onUserChangedSubscription;
 
   @override
@@ -80,9 +79,7 @@ class TransactionsCalendarBloc extends Bloc<TransactionsCalendarEvent, Transacti
   Future<void> close() {
     calendarTransactionsSubscription?.cancel();
     settingsSubscription?.cancel();
-    _onTransactionChangedSubscription?.cancel();
-    _onTransactionAddedSubscription?.cancel();
-    _onTransactionDeletedSubscription?.cancel();
+    _onTransactionEventSubscription?.cancel();
     _onUserChangedSubscription?.cancel();
     return super.close();
   }
@@ -92,9 +89,7 @@ class TransactionsCalendarBloc extends Bloc<TransactionsCalendarEvent, Transacti
     add(TransactionsCalendarUserChanged(id: await amplifyAuthenticationService.getUserID()));
 
     _onUserChangedSubscription = Amplify.Hub.listen(HubChannel.Auth, (hubEvent) {
-      _onTransactionChangedSubscription?.cancel();
-      _onTransactionAddedSubscription?.cancel();
-      _onTransactionDeletedSubscription?.cancel();
+      _onTransactionEventSubscription?.cancel();
 
       if (hubEvent.payload == null) {
         calendarData.clear();
@@ -165,10 +160,8 @@ class TransactionsCalendarBloc extends Bloc<TransactionsCalendarEvent, Transacti
   Stream<TransactionsCalendarState> _mapTransactionsCalendarUserChangedToState(String id) async* {
     yield TransactionsCalendarLoading(sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString);
 
-    AmplifyStreamGroup streams = apiProvider.getTransactionsStreams();
-    _onTransactionAddedSubscription = streams.onTransactionAdded.listen(_onTransactionAdded);
-    _onTransactionChangedSubscription = streams.onTransactionChanged.listen(_onTransactionChanged);
-    _onTransactionDeletedSubscription = streams.onTransactionDeleted.listen(_onTransactionDeleted);
+    Stream<AmplifyApiEvent> stream = apiProvider.getTransactionsStream();
+    _onTransactionEventSubscription = stream.listen(_onTransactionEvent);
 
     _observedDate = DateTime.now();
     add(TransactionsCalendarFetchRequested(dateForFetch: _observedDate!));
@@ -304,5 +297,19 @@ class TransactionsCalendarBloc extends Bloc<TransactionsCalendarEvent, Transacti
       expensesSummary: expensesSummary,
       incomeSummary: incomeSummary,
     ));
+  }
+
+  _onTransactionEvent(AmplifyApiEvent event) async {
+    switch(event.type) {
+      case AmplifyResponseType.add:
+        _onTransactionAdded(event.response);
+        break;
+      case AmplifyResponseType.change:
+        _onTransactionChanged(event.response);
+        break;
+      case AmplifyResponseType.delete:
+        _onTransactionDeleted(event.response);
+        break;
+    }
   }
 }

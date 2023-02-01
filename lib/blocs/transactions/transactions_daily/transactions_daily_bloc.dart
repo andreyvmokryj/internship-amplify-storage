@@ -39,17 +39,13 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
 
   StreamSubscription? dailyTransactionsSubscription;
   StreamSubscription<AuthHubEvent>? _onUserChangedSubscription;
-  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionAddedSubscription;
-  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionChangedSubscription;
-  StreamSubscription<GraphQLResponse<AppTransaction>>? _onTransactionDeletedSubscription;
+  StreamSubscription<AmplifyApiEvent>? _onTransactionEventSubscription;
 
   @override
   Future<void> close() {
     dailyTransactionsSubscription?.cancel();
     settingsSubscription?.cancel();
-    _onTransactionChangedSubscription?.cancel();
-    _onTransactionAddedSubscription?.cancel();
-    _onTransactionDeletedSubscription?.cancel();
+    _onTransactionEventSubscription?.cancel();
     _onUserChangedSubscription?.cancel();
     return super.close();
   }
@@ -81,9 +77,7 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
     _observedDate = DateTime.now();
 
     _onUserChangedSubscription = Amplify.Hub.listen(HubChannel.Auth, (hubEvent) {
-      _onTransactionChangedSubscription?.cancel();
-      _onTransactionAddedSubscription?.cancel();
-      _onTransactionDeletedSubscription?.cancel();
+      _onTransactionEventSubscription?.cancel();
 
       print("${hubEvent.payload?.userId}");
         if (hubEvent.payload == null) {
@@ -112,10 +106,8 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
   Stream<TransactionsDailyState> _mapTransactionDailyUserChangedToState(String id) async* {
     yield TransactionsDailyLoading(sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString);
 
-    AmplifyStreamGroup streams = apiProvider.getTransactionsStreams();
-    _onTransactionAddedSubscription = streams.onTransactionAdded.listen(_onTransactionAdded);
-    _onTransactionChangedSubscription = streams.onTransactionChanged.listen(_onTransactionChanged);
-    _onTransactionDeletedSubscription = streams.onTransactionDeleted.listen(_onTransactionDeleted);
+    Stream<AmplifyApiEvent> stream = apiProvider.getTransactionsStream();
+    _onTransactionEventSubscription = stream.listen(_onTransactionEvent);
 
     _observedDate = DateTime.now();
     add(TransactionsDailyFetchRequested(dateForFetch: _observedDate!));
@@ -231,5 +223,19 @@ class TransactionsDailyBloc extends Bloc<TransactionsDailyEvent, TransactionsDai
 
     add(TransactionsDailyDisplayRequested(
         sliderCurrentTimeIntervalString: _sliderCurrentTimeIntervalString, transactions: dailyData));
+  }
+
+  _onTransactionEvent(AmplifyApiEvent event) async {
+    switch(event.type) {
+      case AmplifyResponseType.add:
+        _onTransactionAdded(event.response);
+        break;
+      case AmplifyResponseType.change:
+        _onTransactionChanged(event.response);
+        break;
+      case AmplifyResponseType.delete:
+        _onTransactionDeleted(event.response);
+        break;
+    }
   }
 }
