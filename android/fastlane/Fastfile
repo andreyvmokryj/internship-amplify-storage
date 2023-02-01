@@ -17,22 +17,66 @@ default_platform(:android)
 
 platform :android do
   desc "Deploy to Closed beta track"
-  lane :closed_beta do
+  lane :test do
+    gradle(task: "test")
+  end
+
+  desc "Submit a new Beta Build to Crashlytics Beta"
+  lane :beta do
+    gradle(task: "clean assembleRelease")
+    crashlytics
+
+    # sh "your_script.sh"
+    # You can also use other beta testing services here
+  end
+
+  desc "Deploy to Firebase app distribution"
+  lane :deploy_firebase do
     begin
-      gradle(task: "clean")
-      gradle(
-        task: "bundle",
-        build_type: 'Release'
-      )
-      upload_to_play_store(
-        track: 'Closed beta',
-        release_status: 'completed',
-        aab: '../build/app/outputs/bundle/release/app-release.aab',
-        skip_upload_metadata: true,
-        skip_upload_images: true,
-        skip_upload_screenshots: true,
-        version_code: flutter_version()["version_code"],
+      firebase_app_distribution(
+        groups: "testers",
+        release_notes: "Fixing bug in features",
+        apk_path: "../build/app/outputs/flutter-apk/app.apk",
+        firebase_cli_path: "/usr/local/bin/firebase",
+        firebase_cli_token: "1//09SeqdHO_RU-9CgYIARAAGAkSNwF-L9Irrq9z6KOiG7eiRkAfyPNX4vB_92tUUihM5uQ0wZPa5BAmMncakGteQDqCBNQCMh2VNsw",
+        app: "1:72098826413:android:34f6a51e682d4c3a315e24"
       )
     end
   end
+
+  desc "Prepare and archive app"
+  lane :prepare  do |options|
+    #bundle_install
+    Dir.chdir "../.." do
+      sh("flutter", "clean")
+      sh("flutter", "packages", "get")
+      sh("flutter", "build", "appbundle", "--no-sound-null-safety")
+    end
+  end
+
+  ### Internal testing
+  lane :internal do
+    begin
+      prepare
+      upload_to_play_store(
+        track: 'internal',
+        release_status: 'completed',
+        aab: '../build/app/outputs/bundle/release/app-release.aab',
+        version_code: flutter_version()["version_code"]
+      )
+    end
+  end
+
+  ### Alpha
+    lane :alpha do
+      begin
+        prepare
+        upload_to_play_store(
+          track: 'alpha',
+          release_status: 'completed',
+          aab: '../build/app/outputs/bundle/release/app-release.aab',
+          version_code: flutter_version()["version_code"]
+        )
+      end
+    end
 end

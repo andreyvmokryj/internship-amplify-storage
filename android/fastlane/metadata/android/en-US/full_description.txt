@@ -1,0 +1,3 @@
+Money Manager offers an easy solution to keep track of your expenses.
+
+You can specify account (cash, credit cards etc), category (i.e. food, household, social life) and some additional information.

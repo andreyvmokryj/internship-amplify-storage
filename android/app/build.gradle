@@ -22,7 +22,7 @@ if (flutterVersionName == null) {
 }
 
 def keystorePropertiesFile = file("../keys/key.properties")
-//def keystoreFile = file("../keys/money_manager.keystore")
+def keystoreFile = file("../keys/money_manager.keystore")
 def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
@@ -40,9 +40,9 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.radency.radency_internship_project_2"
+        applicationId "com.radency.radency_internship_project_2_mav"
         minSdkVersion 24
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
@@ -50,16 +50,16 @@ android {
 
     signingConfigs {
         release {
-//            keyAlias keystoreProperties['release.keyAlias']
-//            keyPassword keystoreProperties['release.keyPassword']
-//            storePassword keystoreProperties['release.storePassword']
-//            storeFile keystoreFile
+            keyAlias keystoreProperties['release.keyAlias']
+            keyPassword keystoreProperties['release.keyPassword']
+            storePassword keystoreProperties['release.storePassword']
+            storeFile keystoreFile
         }
         debug {
-//            keyAlias keystoreProperties['debug.keyAlias']
-//            keyPassword keystoreProperties['debug.keyPassword']
-//            storePassword keystoreProperties['debug.storePassword']
-//            storeFile keystoreFile
+            keyAlias keystoreProperties['debug.keyAlias']
+            keyPassword keystoreProperties['debug.keyPassword']
+            storePassword keystoreProperties['debug.storePassword']
+            storeFile keystoreFile
         }
     }
 
